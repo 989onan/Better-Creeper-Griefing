@@ -3,11 +3,7 @@ package com.bettercreepergriefing.config;
 import java.io.File;
 
 import com.bettercreepergriefing.MainBetterCreeperGriefing;
-import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.ConfigFormat;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.file.CommentedFileConfigBuilder;
-import com.electronwill.nightconfig.core.file.GenericBuilder;
 import com.electronwill.nightconfig.core.io.WritingMode;
 
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -34,10 +30,10 @@ public class ConfigLoaderAndReader {
 		config.setConfig(file);
 		
 	}
-	//initializing varibles that will have the values in the config file
+	//initializing variables that will have the values in the config file
 	public static ForgeConfigSpec.DoubleValue damagemultiplier;
 	
-	//loading values into varibles
+	//loading values into variables
 	public static void init(ForgeConfigSpec.Builder serverconfig) {
 		serverconfig.comment("Better Creeper Griefing Config");
 		
