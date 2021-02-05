@@ -2,6 +2,8 @@ package com.bettercreepergriefing;
 
 import java.util.List;
 
+
+
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +23,8 @@ import net.minecraft.entity.item.TNTEntity;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -29,7 +33,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityMobGriefingEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -55,12 +59,12 @@ public class MainBetterCreeperGriefing {
     //all of this below is how the mod overrides the creeper explosion, changes the explosion behavior, and then
     //does the explosion.
 	@SubscribeEvent
-	public void creeperoverride(EntityMobGriefingEvent event) {
+	public void onExplosionStart(ExplosionEvent.Start event){
 			//LOGGER.info("checked Griefing!");
 			
-		if (event.getEntity().getType() == EntityType.CREEPER) {
-			event.setResult(Result.DENY);
-			CreeperEntity creeper = (CreeperEntity) event.getEntity();
+		if (event.getExplosion().getExplosivePlacedBy() instanceof CreeperEntity) {
+			event.setCanceled(true);
+			CreeperEntity creeper = (CreeperEntity) event.getExplosion().getExplosivePlacedBy();
 			World world = creeper.getEntityWorld();
 			BlockPos pos = creeper.getPosition();
 			float h = creeper.isCharged() ? 2.0F : 1.0F;
@@ -68,6 +72,7 @@ public class MainBetterCreeperGriefing {
 			if (creeper.serializeNBT().contains("ExplosionRadius", 99)) {
 				size = creeper.serializeNBT().getByte("ExplosionRadius")*h;
 			}
+			creeper.world.createExplosion(null, creeper.getPosX(), creeper.getPosY(), creeper.getPosZ(), size, Explosion.Mode.NONE);
 			Map<PlayerEntity, Vector3d> playerKnockbackMap = Maps.newHashMap();
 			
 			if(world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
@@ -136,6 +141,9 @@ public class MainBetterCreeperGriefing {
 			else {//no mob griefing enabled
 				doExplosionDamage(pos, world,size,creeper,playerKnockbackMap);
 			}
+			
+			//remove creeper
+			creeper.remove();
 		}
 	}
 	
